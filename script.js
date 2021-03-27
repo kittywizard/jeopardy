@@ -12,8 +12,10 @@
 */
 let min = 1;
 let max = 50;
-const count = 4;
+const count = 6;
 let offset = Math.floor((Math.random() * (max - min + 1)) + min); 
+
+const grid = document.querySelector(".grid");
 
 /* notes: 
     guessing offset will have to be random - to get different categories each time
@@ -28,11 +30,23 @@ async function getCategories() {
     console.log(json);
 
     json.forEach(category => {
-        //need to create a div and insert it into the grid
-        //apply a class
-        //add in category info
+        let div = document.createElement('div');
+        div.classList.add('grid-item', 'category');
+        div.textContent = category.title;
+        grid.appendChild(div);
     });
 
+    getGrid();
 }
 
 getCategories();
+
+function getGrid() {
+    const number = 5 * 6;
+    
+    for(let i = 0; i < number; i++) {
+        let clue = document.createElement("div");
+        clue.classList.add("grid-item", "clue");
+        grid.appendChild(clue);
+    }
+}
