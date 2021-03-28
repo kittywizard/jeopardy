@@ -1,27 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Teko:wght@700&display=swap');
+
 .grid {
     width: 90%;
     margin: 0 auto;
     display: grid;
     grid-template-columns: repeat(6, 1fr);  
     grid-template-rows:  repeat(6, 1fr);
+    border:10px solid gold;
 }
 
 .grid-item {
     justify-content: baseline;
-    padding: 1em;
+    padding: 0.5em;
     border: 1px solid #fff;
     background-color: darkblue;
-
+   text-transform: uppercase;
 }
 
 .category {    
     color: white;
-    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    font-family:'Teko', sans-serif;
+    font-weight: 700;
     text-align: center;
+    font-size: 1.75rem;
+    line-height: 1;
+    letter-spacing: 1.3;
 }
 
 .clue {
     color: gold;
-    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-    font-size: 2rem;
+    font-family:'Teko', sans-serif;
+    font-weight: 700;
+    font-size: 3rem;
+    text-align: center;
 }

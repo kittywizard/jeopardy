@@ -14,14 +14,9 @@ let min = 1;
 let max = 50;
 const count = 6;
 let offset = Math.floor((Math.random() * (max - min + 1)) + min); 
+let clueGrid = ["$200", "$400", "$600", "$800", "$1000"]; //you can do this with math, you lazy bum
 
 const grid = document.querySelector(".grid");
-
-/* notes: 
-    guessing offset will have to be random - to get different categories each time
-    count should be standard since its jeopardy, but could still be a variable
-
-*/
 
 async function getCategories() {
     let result = await fetch(`https://jservice.io/api/categories/?count=${count}&offset=${offset}`);
@@ -47,6 +42,12 @@ function getGrid() {
     for(let i = 0; i < number; i++) {
         let clue = document.createElement("div");
         clue.classList.add("grid-item", "clue");
+        clue.textContent = clueGrid[0];
         grid.appendChild(clue);
     }
 }
+
+/* notes
+    going to need event listeners on all the 'clue' divs
+    i think we can add them all to an array and forEach it?
+*/
