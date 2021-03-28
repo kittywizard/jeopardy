@@ -21,9 +21,11 @@ const grid = document.querySelector(".grid");
 async function getCategories() {
     let result = await fetch(`https://jservice.io/api/categories/?count=${count}&offset=${offset}`);
     let json = await result.json();
+    return json;
+}
 
-    console.log(json);
-
+getCategories().then(json => {
+        
     json.forEach(category => {
         let div = document.createElement('div');
         div.classList.add('grid-item', 'category');
@@ -32,9 +34,7 @@ async function getCategories() {
     });
 
     getGrid();
-}
-
-getCategories();
+});
 
 function getGrid() {
     const number = 5 * 6;
