@@ -13,8 +13,9 @@
 let min = 1;
 let max = 50;
 const count = 6;
-let offset = Math.floor((Math.random() * (max - min + 1)) + min); 
-let clueGrid = ["$200", "$400", "$600", "$800", "$1000"]; //you can do this with math, you lazy bum
+let offset = Math.floor((Math.random() * (max - min + 1)) + min);
+let clueGrid = [];
+let values = [200, 400, 600, 800, 1000];
 
 const grid = document.querySelector(".grid");
 
@@ -25,26 +26,51 @@ async function getCategories() {
 }
 
 getCategories().then(json => {
-        
+
     json.forEach(category => {
         let div = document.createElement('div');
         div.classList.add('grid-item', 'category');
         div.textContent = category.title;
         grid.appendChild(div);
+
+        let categoryId = category.id;
+        clueGrid.push(categoryId);
     });
 
     getGrid();
 });
 
 function getGrid() {
-    const number = 5 * 6;
+
+    for(let a = 0; a < 5; a++) {
+        for (let i = 0; i < 6; i++) {
+            let clue = document.createElement("div");
+            clue.classList.add("grid-item", "clue");
     
-    for(let i = 0; i < number; i++) {
-        let clue = document.createElement("div");
-        clue.classList.add("grid-item", "clue");
-        clue.textContent = clueGrid[0];
-        grid.appendChild(clue);
+            clue.textContent = `$${values[a]}`;
+    
+            grid.appendChild(clue);
+    
+        }
+
     }
+
+
+
+
+
+    //getClues();
+}
+
+function getClues() {
+    clueGrid.forEach(clue => {
+        fetch(`https://jservice.io/api/clues/?category=${clue}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data[0].value)
+            });
+    });
+
 }
 
 /* notes
