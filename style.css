@@ -1,4 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Teko:wght@700&display=swap');
+/* 
+to do: 
+    add in media queries so things stop breaking at small screen sizes
+    come up with a mobile layout??? for jeopardy???
+*/
 
 .grid {
     width: 90%;
@@ -11,7 +16,7 @@
 
 .grid-item {
     justify-content: baseline;
-    padding: 0.5em;
+    padding: 0.3em;
     border: 1px solid #fff;
     background-color: darkblue;
    text-transform: uppercase;
@@ -33,4 +38,16 @@
     font-weight: 700;
     font-size: 3rem;
     text-align: center;
+}
+
+.dim {
+    opacity: 0.2;
+}
+
+.container {
+    padding: 2em;
+    margin: 0 auto;
+    width: 50%;
+    text-align: center;
+    font-family: 'Helvetica', 'Arial', sans-serif;
 }

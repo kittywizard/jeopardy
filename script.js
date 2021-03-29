@@ -14,14 +14,19 @@ let min = 1;
 let max = 50;
 const count = 6;
 let offset = Math.floor((Math.random() * (max - min + 1)) + min);
+
 let clueGrid = [];
 let values = [200, 400, 600, 800, 1000];
+let modal, clueDivs;
+let clueValues = [];
 
 const grid = document.querySelector(".grid");
+const container = document.querySelector(".container");
 
 async function getCategories() {
     let result = await fetch(`https://jservice.io/api/categories/?count=${count}&offset=${offset}`);
     let json = await result.json();
+    console.log(json)
     return json;
 }
 
@@ -33,8 +38,7 @@ getCategories().then(json => {
         div.textContent = category.title;
         grid.appendChild(div);
 
-        let categoryId = category.id;
-        clueGrid.push(categoryId);
+        clueGrid.push(category.id);
     });
 
     getGrid();
@@ -50,28 +54,59 @@ function getGrid() {
             grid.appendChild(clue);
         }
     }
-    //getClues();
-}
 
-function getClues() {
-    clueGrid.forEach(clue => {
-        fetch(`https://jservice.io/api/clues/?category=${clue}`)
-            .then(response => response.json())
-            .then(data => {
-                console.log(data[0].value)
-            });
+
+    clueDivs = document.querySelectorAll(".clue"); 
+    clueDivs.forEach(div => {
+        div.addEventListener('click', () => createModal(div));
+
+        //i don't know if this actually helps me or not.
+        let valueNum = parseInt(div.outerText.slice(1,4));
+        clueValues.push(valueNum);
     });
 
 }
 
+
+function createModal(div) {
+    modal = document.createElement("div");
+    grid.classList.add("dim"); // temp solution
+    //console.log(clueDivs[0].outerText); //this returns the content! then i can strip out the $ and use it as value variable.
+    //parseInt(clueDivs[var].outerText.slice(1,4)) will == the above ^^
+
+        fetch(`https://jservice.io/api/clues/?category=${clueGrid[0]}`)
+            .then(response => response.json())
+            .then(data => {
+                let question = data[0].question;
+                let answer = data[0].answer;
+                modal.textContent = `Question: ${question}`;
+
+                let answerBtn = document.createElement("button");
+                answerBtn.textContent = "Answer?";
+                modal.appendChild(answerBtn);
+
+                container.appendChild(modal);
+
+                answerBtn.addEventListener('click', () => {
+                    answerBtn.style.display = 'none';
+                    let answerDiv = document.createElement("div");
+                    answerDiv.textContent = `The Answer is: ${answer}`;
+                    modal.appendChild(answerDiv);
+                });
+            });
+}
+
 /* notes
-    going to need event listeners on all the 'clue' divs
-    i think we can add them all to an array and forEach it?
 
     next up: 
-    gather all the clue divs querySelectorAll 
-    add event listener
-    console log
-    need to create modal w/ question
-    
+
+    need to fix positioning on modal, so it appears on the middle of the screen
+        whole lotta positioning on this stupid thing. see scrimba course about it  ^
+
+    need to pull in the clue that matches both category AND value
+    how to find value?
+        use an array for the grid? can determine value by determining the position in the array?? <-have this
+        could use position on grid to determine which category and it's value. MATH
+
+
 */
