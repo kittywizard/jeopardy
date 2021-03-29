@@ -46,19 +46,10 @@ function getGrid() {
         for (let i = 0; i < 6; i++) {
             let clue = document.createElement("div");
             clue.classList.add("grid-item", "clue");
-    
             clue.textContent = `$${values[a]}`;
-    
             grid.appendChild(clue);
-    
         }
-
     }
-
-
-
-
-
     //getClues();
 }
 
@@ -76,4 +67,11 @@ function getClues() {
 /* notes
     going to need event listeners on all the 'clue' divs
     i think we can add them all to an array and forEach it?
+
+    next up: 
+    gather all the clue divs querySelectorAll 
+    add event listener
+    console log
+    need to create modal w/ question
+    
 */
