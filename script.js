@@ -15,34 +15,88 @@ let max = 75;
 const count = 6;
 let offset = Math.floor((Math.random() * (max - min + 1)) + min); //need to figure out offset, i keep getting the same categories
 
-
 // let clueGrid = [];
 // let values = [200, 400, 600, 800, 1000];
 // let modal, clueDivs;
 // let clueValues = [];
 
 let content = [];
+let clueObj =[];
 
 const grid = document.querySelector(".grid");
 const container = document.querySelector(".container");
 
- function getCategories() {
-     //let result = await 
+function getCategories() {
+    //let result = await 
     fetch(`https://jservice.io/api/categories/?count=${count}&offset=${offset}`)
         .then(response => response.json())
         .then(data => {
             data.forEach(data => {
                 let arr = [data.id, data.title];
                 content.push(arr);
+                
+                let div = document.createElement('div');
+                div.classList.add('grid-item', 'category');
+                div.textContent = data.title;
+                grid.appendChild(div);
+            });
+        })
+        .then(data => {
+            //we're not actually using 'data' oops
+            content.forEach(category => {
+                let id = category[0];
+
+                fetch(`https://jservice.io/api/clues/?category=${category[0]}`) //i believe this is implying that its actually category[foreachposition][0]
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        /*
+                            PROBLEMS:
+                            pulling in way more numbers than we need - might be related to the issues below
+                            we got some categories with more questions/answers than we need
+                            some are OUT OF ORDER. starting with 200
+                            need to sort by value. 
+                            THEN we need to only grab 6 - one FOR EACH lol value we need
+
+                        */
+
+                        data.forEach(clue => {
+                            clueObj.push(
+                                {
+                                    "question": clue.question,
+                                    "answer": clue.answer,
+                                    "airDate": clue.airdate,
+                                    "value": clue.value
+                                }
+                            );
+                            let div = document.createElement('div');
+                            div.classList.add('grid-item', 'clue');
+                            div.setAttribute("id", `${id}-hi`); //need to make this unique based on the position in the grid
+                            //but need to actually set the grid up properly and WHY ARE THINGS NULL
+                            div.textContent = `$${clue.value}`;
+                            //console.log(div)
+                            grid.appendChild(div);
+                        });
+
+                    })
+
             });
 
         })
-                            
+
     // return await result.json();
+    testFunction(clueObj)
 }
 
 getCategories();
 
+function testFunction(obj) {
+    console.log(obj)
+    obj.forEach(obj => {
+
+        console.log(clueObj.value);
+    })
+}
 // getCategories().then(json => {
 //     json.forEach(category => {
 //         let div = document.createElement('div');
@@ -73,9 +127,9 @@ function getGrid() {
     clueDivs.forEach(div => {
         div.addEventListener('click', (e) => {
             console.log(e.target.textContent)
-            
+
             createModal(div)
-        
+
         });
 
         //i don't know if this actually helps me or not.
@@ -87,7 +141,7 @@ function getGrid() {
 
 
 function createModal(div) {
-    
+
     modal = document.createElement("div");
     modal.classList.add("modal");
     grid.classList.add("dim"); // temp solution
