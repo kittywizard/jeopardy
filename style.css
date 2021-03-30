@@ -47,7 +47,21 @@ to do:
 .container {
     padding: 2em;
     margin: 0 auto;
-    width: 50%;
+    width: 70%;
     text-align: center;
     font-family: 'Helvetica', 'Arial', sans-serif;
+}
+
+.modal {
+    background-color: rgb(166, 200, 250);
+    padding: 0.5em;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.answer {
+    background-color:rgb(109, 145, 199);
+    padding: 0.5em;
+    margin-left: 1em;
 }

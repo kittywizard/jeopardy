@@ -11,9 +11,10 @@
         using CSS Grid
 */
 let min = 1;
-let max = 50;
+let max = 75;
 const count = 6;
-let offset = Math.floor((Math.random() * (max - min + 1)) + min);
+let offset = Math.floor((Math.random() * (max - min + 1)) + min); //need to figure out offset, i keep getting the same categories
+
 
 let clueGrid = [];
 let values = [200, 400, 600, 800, 1000];
@@ -25,9 +26,7 @@ const container = document.querySelector(".container");
 
 async function getCategories() {
     let result = await fetch(`https://jservice.io/api/categories/?count=${count}&offset=${offset}`);
-    let json = await result.json();
-    console.log(json)
-    return json;
+    return await result.json();
 }
 
 getCategories().then(json => {
@@ -70,6 +69,7 @@ function getGrid() {
 
 function createModal(div) {
     modal = document.createElement("div");
+    modal.classList.add("modal");
     grid.classList.add("dim"); // temp solution
     //console.log(clueDivs[0].outerText); //this returns the content! then i can strip out the $ and use it as value variable.
     //parseInt(clueDivs[var].outerText.slice(1,4)) will == the above ^^
@@ -90,6 +90,7 @@ function createModal(div) {
                 answerBtn.addEventListener('click', () => {
                     answerBtn.style.display = 'none';
                     let answerDiv = document.createElement("div");
+                    answerDiv.classList.add("answer");
                     answerDiv.textContent = `The Answer is: ${answer}`;
                     modal.appendChild(answerDiv);
                 });
