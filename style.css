@@ -9,17 +9,31 @@ to do:
     width: 90%;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(6, 1fr);  
-    grid-template-rows:  repeat(6, 1fr);
+    grid-template-areas: 
+    "category category category category category category"
+    "200 200 200 200 200 200"
+    "400 400 400 400 400 400"
+    "600 600 600 600 600 600"
+    "800 800 800 800 800 800"
+    "1000 1000 1000 1000 1000 1000";
     border:10px solid gold;
 }
+
+/* .grid {
+    width: 90%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: baseline;
+} */
 
 .grid-item {
     justify-content: baseline;
     padding: 0.3em;
     border: 1px solid #fff;
     background-color: darkblue;
-   text-transform: uppercase;
+    text-transform: uppercase;
 }
 
 .category {    
@@ -40,6 +54,14 @@ to do:
     text-align: center;
 }
 
+.v200 {grid-area: 200;}
+.v400 {grid-area: 400;}
+.v600 {grid-area: 600;}
+.v800 {grid-area: 800;}
+.v1000 {grid-area: 1000;}
+
+
+/* modal stuff below */
 .dim {
     opacity: 0.2;
 }

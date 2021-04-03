@@ -10,8 +10,11 @@
         in a simplified 4x5 Jeopardy Board 
         using CSS Grid
 */
+const grid = document.querySelector(".grid");
+const container = document.querySelector(".container");
+
 let min = 1;
-let max = 75;
+let max = 100;
 const count = 6;
 let offset = Math.floor((Math.random() * (max - min + 1)) + min); //need to figure out offset, i keep getting the same categories
 
@@ -25,31 +28,28 @@ let content = [],
     testArray = [],
     finalArr = [];
 
-function ClueObject (question, answer, id, value, airdate) {
+function ClueObject(question, answer, id, value, airdate, count) {
     this.question = question;
     this.answer = answer;
     this.id = id;
     this.value = value;
     this.airdate = airdate;
+    this.clueCount = count;
 }
 
-function findValue(obj, val) {
-    return obj.value === val;
+function CategoryObject(id, title, clueCount) {
+    this.id = id;
+    this.title = title;
+    this.clueCount = clueCount;
 }
 
-const grid = document.querySelector(".grid");
-const container = document.querySelector(".container");
-
-function getCategories() {
-    //let result = await 
+function getCategories(count) {
     fetch(`https://jservice.io/api/categories/?count=${count}&offset=${offset}`)
         .then(response => response.json())
         .then(data => {
             data.forEach(data => {
-                let arr = [data.id, data.title];
-                content.push(arr);
-                
-                
+                content.push(new CategoryObject(data.id, data.title, data.clues_count));
+
                 let div = document.createElement('div');
                 div.classList.add('grid-item', 'category');
                 div.textContent = data.title;
@@ -58,59 +58,47 @@ function getCategories() {
         })
         .then(() => {
             content.forEach(category => {
-                let id = category[0];
-                fetch(`https://jservice.io/api/clues/?category=${category[0]}`) //i believe this is implying that its actually category[foreachposition][0]
-                    .then(response => response.json())
-                    .then(data => {
-
-                        //this will gather all the clues for each category and push them into an array
-                        data.forEach(clue => {                            
-                            let newObj = new ClueObject(clue.question, clue.answer, clue.category_id, clue.value, clue.airdate);
-                            testArray.push(newObj);
-                            // {
-                            //     "question": clue.question,
-                            //     "answer": clue.answer,
-                            //     "airDate": clue.airdate,
-                            //     "value": clue.value,
-                            // }
-
-                            // let div = document.createElement('div');
-                            // div.classList.add('grid-item', 'clue');
-                            // div.setAttribute("id", `${id}-hi`); //need to make this unique based on the position in the grid
-                            // //but need to actually set the grid up properly and WHY ARE THINGS NULL
-                            // div.textContent = `$${clue.value}`;
-                            // grid.appendChild(div);
-                        });
-
-
-                        //filters all the clues  of the current category into an array
-                        let categoryArr = testArray.filter(obj => obj.id == id);
-
-                        //check to see if the length of said array is greater than 5, in which case it needs to be checked out
-                        if(categoryArr.length > 5) {
-
-                            //for as long as the number is less than the array's length
-                            for(let i = 0; i < categoryArr.length; i++) {
-                                let valueCheck = 200;
-                                //find the first one that match the above yes?? 
-                                finalArr.push(categoryArr.find(cat => cat.value === valueCheck));
-                                console.log(finalArr);
-                         }
-
-                        }
-
-                    });
-
+                if (category.clueCount > 5) fetch5(category.id, [200, 400, 600, 800, 1000]);
+                else {
+                    fetch(`https://jservice.io/api/clues/?category=${category.id}`)
+                        .then(response => response.json())
+                        .then(data => data.forEach(clue => getClues(clue)))
+                }
             });
-
-        });
-
-    // return await result.json();
-
+        })
 }
 
-getCategories();
+function fetch5(categoryid, value) {
+    value.forEach(val => {
+            fetch(`https://jservice.io/api/clues/?category=${categoryid}&value=${val}`)
+            .then(response => response.json())
+            .then(data => getClues(data[0]))
+    });
+}
 
+function getClues(clue) {
+    let newObj = new ClueObject(clue.question, clue.answer, clue.category_id, clue.value, clue.airdate);
+    testArray.push(newObj);
+    testArray.sort(function(a, b) {
+        return a.value - b.value;
+    });
+    
+    //need to test why there are NULLS 
+    testArray.forEach(element => {
+        if(element.value == null) console.log(element);
+    })
+
+
+
+
+    let div = document.createElement('div');
+    div.classList.add('grid-item', 'clue', `v${newObj.value}`);
+    //div.setAttribute("id", `${newObj.id}-`); //need to fix this to have a unique number
+    //but need to actually set the grid up properly and WHY ARE THINGS NULL
+    div.textContent = `$${newObj.value}`;
+    grid.appendChild(div);
+}
+getCategories(count);
 
 // getCategories().then(json => {
 //     json.forEach(category => {
