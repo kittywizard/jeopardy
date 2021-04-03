@@ -18,14 +18,9 @@ let max = 100;
 const count = 6;
 let offset = Math.floor((Math.random() * (max - min + 1)) + min); //need to figure out offset, i keep getting the same categories
 
-// let clueGrid = [];
-// let values = [200, 400, 600, 800, 1000];
-// let modal, clueDivs;
-// let clueValues = [];
-
 let content = [],
     clueObj = [],
-    testArray = [],
+    clueArray = [],
     finalArr = [];
 
 function ClueObject(question, answer, id, value, airdate, count) {
@@ -63,6 +58,16 @@ function getCategories(count) {
                     fetch(`https://jservice.io/api/clues/?category=${category.id}`)
                         .then(response => response.json())
                         .then(data => data.forEach(clue => getClues(clue)))
+                        .then(() => {
+                            clueArray.sort((a, b) => a.value - b.value);
+                            //search with category.id and values
+                            clueArray.forEach(clue => {
+                                if(clue.value == null) {
+                                    //need to gather all the other clues with the same id
+                                    console.log(`clue's value is: ${clue.value} and id is ${clue.id}`)
+                                }
+                            })
+                        });
                 }
             });
         })
@@ -73,7 +78,7 @@ function getCategories(count) {
 
 function fetch5(categoryid, value) {
     value.forEach(val => {
-            fetch(`https://jservice.io/api/clues/?category=${categoryid}&value=${val}`)
+        fetch(`https://jservice.io/api/clues/?category=${categoryid}&value=${val}`)
             .then(response => response.json())
             .then(data => getClues(data[0]))
     });
@@ -81,10 +86,7 @@ function fetch5(categoryid, value) {
 
 function getClues(clue) {
     let newObj = new ClueObject(clue.question, clue.answer, clue.category_id, clue.value, clue.airdate);
-    testArray.push(newObj);
-    testArray.sort(function(a, b) {
-        return a.value - b.value;
-    });
+    clueArray.push(newObj);
 
     let div = document.createElement('div');
     div.classList.add('grid-item', 'clue', `v${newObj.value}`);
@@ -94,19 +96,6 @@ function getClues(clue) {
     grid.appendChild(div);
 }
 getCategories(count);
-
-// getCategories().then(json => {
-//     json.forEach(category => {
-//         let div = document.createElement('div');
-//         div.classList.add('grid-item', 'category');
-//         div.textContent = category.title;
-//         grid.appendChild(div);
-
-//         clueGrid.push(category.id);
-//     });
-
-//     getGrid();
-// });
 
 function getGrid() {
 
@@ -174,14 +163,7 @@ function createModal(div) {
 /* notes
 
     next up: 
-
-    need to fix positioning on modal, so it appears on the middle of the screen
-        whole lotta positioning on this stupid thing. see scrimba course about it  ^
-
-    need to pull in the clue that matches both category AND value
-    how to find value?
-        use an array for the grid? can determine value by determining the position in the array?? <-have this
-        could use position on grid to determine which category and it's value. MATH
-
-
+        - figure out where the null values are coming from
+        - potentially because they are daily doubles. need to either note that somewhere for later
+        - or, need to assign it whichever value is missing
 */
