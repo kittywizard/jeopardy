@@ -68,6 +68,9 @@ function getCategories(count) {
         })
 }
 
+//this function, in theory should allow us to only pick the first value of each and shove it into the 
+//test array, a variable i really need to rename. 
+
 function fetch5(categoryid, value) {
     value.forEach(val => {
             fetch(`https://jservice.io/api/clues/?category=${categoryid}&value=${val}`)
@@ -82,18 +85,10 @@ function getClues(clue) {
     testArray.sort(function(a, b) {
         return a.value - b.value;
     });
-    
-    //need to test why there are NULLS 
-    testArray.forEach(element => {
-        if(element.value == null) console.log(element);
-    })
-
-
-
 
     let div = document.createElement('div');
     div.classList.add('grid-item', 'clue', `v${newObj.value}`);
-    //div.setAttribute("id", `${newObj.id}-`); //need to fix this to have a unique number
+    div.setAttribute("id", `${newObj.id}-${newObj.value}`); //need to fix this to have a unique number
     //but need to actually set the grid up properly and WHY ARE THINGS NULL
     div.textContent = `$${newObj.value}`;
     grid.appendChild(div);
