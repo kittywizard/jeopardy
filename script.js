@@ -19,9 +19,9 @@ const count = 6;
 let offset = Math.floor((Math.random() * (max - min + 1)) + min); //need to figure out offset, i keep getting the same categories
 
 let content = [],
-    clueObj = [],
     clueArray = [],
-    finalArr = [];
+    finalArr = [],
+    newArr = [];
 
 function ClueObject(question, answer, id, value, airdate, count) {
     this.question = question;
@@ -61,16 +61,23 @@ function getCategories(count) {
                         .then(() => {
                             clueArray.sort((a, b) => a.value - b.value);
                             //search with category.id and values
-                            clueArray.forEach(clue => {
-                                if(clue.value == null) {
-                                    //need to gather all the other clues with the same id
-                                    console.log(`clue's value is: ${clue.value} and id is ${clue.id}`)
-                                }
-                            })
+                            //clueArray.forEach(clue => {if(clue.value == null) checkNulls(clueArray, clue, clue.id)})
                         });
                 }
             });
         })
+}
+
+function checkNulls(arr, clue, id) {
+    //so i've got the entire array, the specific clue that triggered the call (which i honestly might not need?) 
+    //and the category id so i can just pull the others
+
+    arr.forEach(clue => {
+        if(clue.id == id){
+            newArr.push(clue);
+        }
+    })
+ console.log(newArr)
 }
 
 //this function, in theory should allow us to only pick the first value of each and shove it into the 
@@ -80,7 +87,13 @@ function fetch5(categoryid, value) {
     value.forEach(val => {
         fetch(`https://jservice.io/api/clues/?category=${categoryid}&value=${val}`)
             .then(response => response.json())
-            .then(data => getClues(data[0]))
+            .then(data => {
+                if(data[0].value != null) getClues(data[0])
+                else {
+                    console.log(data[Math.floor((Math.random() * (data.length - 1)) + 1)])
+                    getClues(data[Math.floor((Math.random() * (data.length - 1)) + 1)])
+                }
+            })
     });
 }
 
