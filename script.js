@@ -61,7 +61,7 @@ function getCategories(count) {
                         .then(() => {
                             clueArray.sort((a, b) => a.value - b.value);
                             //search with category.id and values
-                            //clueArray.forEach(clue => {if(clue.value == null) checkNulls(clueArray, clue, clue.id)})
+                            clueArray.forEach(clue => {if(clue.value == null) checkNulls(clueArray, clue, clue.id)})
                         });
                 }
             });
@@ -70,14 +70,12 @@ function getCategories(count) {
 
 function checkNulls(arr, clue, id) {
     //so i've got the entire array, the specific clue that triggered the call (which i honestly might not need?) 
-    //and the category id so i can just pull the others
+    //and the category id so i can just pull the others in the category?
 
-    arr.forEach(clue => {
-        if(clue.id == id){
-            newArr.push(clue);
-        }
-    })
- console.log(newArr)
+ console.log(clue)
+ //this is going off too many times?
+ //getting a bunch of repeat clues
+
 }
 
 //this function, in theory should allow us to only pick the first value of each and shove it into the 
@@ -108,6 +106,7 @@ function getClues(clue) {
     div.textContent = `$${newObj.value}`;
     grid.appendChild(div);
 }
+
 getCategories(count);
 
 function getGrid() {
