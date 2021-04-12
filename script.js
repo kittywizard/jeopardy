@@ -1,4 +1,3 @@
-
 const grid = document.querySelector(".grid");
 const container = document.querySelector(".container");
 
@@ -8,7 +7,7 @@ const count = 6; //determines the number of categories
 //TODO need to figure out offset, i keep getting the same categories
 let min = 1;
 let max = 100;
-let offset = Math.floor((Math.random() * (max - min + 1)) + min); 
+let offset = Math.floor((Math.random() * (max - min + 1)) + min);
 
 //all the various arrays i've needed
 let content = [],
@@ -17,13 +16,15 @@ let content = [],
     newArr = [];
 
 //objects to store clue/category data
-function ClueObject(question, answer, id, value, airdate, count) {
+//do i still use the count / clueCount one?
+function ClueObject(question, answer, id, value, airdate, count, isNull) {
     this.question = question;
     this.answer = answer;
     this.id = id;
     this.value = value;
     this.airdate = airdate;
     this.clueCount = count;
+    this.isNull = isNull;
 }
 
 function CategoryObject(id, title, clueCount) {
@@ -57,10 +58,8 @@ function getCategories(count) {
                         .then(data => data.forEach(clue => getClues(clue)))
                         //after clues are fetched, either by fetch5 or the normal way, i need to sort the array
                         .then(() => {
-                            //this is where i need to check for the null values
-                            //TODO - the null checker doesn't seem to be working properly
+
                             clueArray.sort((a, b) => a.value - b.value);
-                            //clueArray.forEach(clue => {if(clue.value == null) checkNulls(clueArray, clue, clue.id)})
                         });
                 }
             });
@@ -71,15 +70,18 @@ function getCategories(count) {
 //3. runs after getCategories()
 //4. goes back to getCategories after finished running, returning its result
 function getClues(clue) {
-    let newObj = new ClueObject(clue.question, clue.answer, clue.category_id, clue.value, clue.airdate);
+    let newObj = new ClueObject(clue.question, clue.answer, clue.category_id, clue.value, clue.airdate, false)
+    if (clue.value == null) newObj.isNull = true;
     clueArray.push(newObj);
 
     let div = document.createElement('div');
     div.classList.add('grid-item', 'clue', `v${newObj.value}`);
-    div.setAttribute("id", `${newObj.id}-${newObj.value}`); //need to fix this to have a unique number
-    //but need to actually set the grid up properly and WHY ARE THINGS NULL
+    div.setAttribute("id", `${newObj.id}-${newObj.value}`); //need to fix this to have a unique number -- might already be unique, i'm just dumb
+
     div.textContent = `$${newObj.value}`;
     grid.appendChild(div);
+
+    getEvent();
 }
 
 //3. get called around the same time as getClues, depending on parameters
@@ -88,7 +90,7 @@ function fetch5(categoryid, value) {
         fetch(`https://jservice.io/api/clues/?category=${categoryid}&value=${val}`)
             .then(response => response.json())
             .then(data => {
-                if(data[0].value != null) getClues(data[0])
+                if (data[0].value != null) getClues(data[0])
                 else {
                     console.log(data[Math.floor((Math.random() * (data.length - 1)) + 1)])
                     getClues(data[Math.floor((Math.random() * (data.length - 1)) + 1)])
@@ -97,22 +99,16 @@ function fetch5(categoryid, value) {
     });
 }
 
-//5. a work in progress function 
-function checkNulls(arr, clue, id) {
-    //so i've got the entire array, the specific clue that triggered the call (which i honestly might not need?) 
-    //and the category id so i can just pull the others in the category?
-
- console.log(clue)
- //this is going off too many times?
- //getting a bunch of repeat clues
-
-}
-
 getCategories(count);
 
 function getEvent() {
     let divs = document.querySelectorAll('.clue');
-    console.log(divs);
+    divs.forEach(div => {
+        div.addEventListener('click', () => {
+            //figure out how to grab the id 
+            //then createModal(div) it
+        })
+    })
 }
 
 function createModal(div) {
@@ -120,38 +116,28 @@ function createModal(div) {
     modal = document.createElement("div");
     modal.classList.add("modal");
     grid.classList.add("dim"); // temp solution
-    //console.log(clueDivs[0].outerText); //this returns the content! then i can strip out the $ and use it as value variable.
-    //parseInt(clueDivs[var].outerText.slice(1,4)) will == the above ^^
 
-    fetch(`https://jservice.io/api/clues/?category=${clueGrid[0]}`)
-        .then(response => response.json())
-        .then(data => {
-            console.log(data)
-            let question = data[0].question;
-            let answer = data[0].answer;
-            modal.textContent = `Question: ${question} `;
-            //modal.textContent += `This question originally aired ${data[0].airdate}`;
+    /*
+    need to rework this whole function to pull in the clue div information depending on which one was clicked!
+    use unique id for this??
 
-            let answerBtn = document.createElement("button");
-            answerBtn.textContent = "Answer?";
-            modal.appendChild(answerBtn);
+    */
 
-            container.appendChild(modal);
+    modal.textContent = `Question:  `;
+    //modal.textContent += `This question originally aired ${data[0].airdate}`;
 
-            answerBtn.addEventListener('click', () => {
-                answerBtn.style.display = 'none';
-                let answerDiv = document.createElement("div");
-                answerDiv.classList.add("answer");
-                answerDiv.textContent = `The Answer is: ${answer}`;
-                modal.appendChild(answerDiv);
-            });
-        });
+    let answerBtn = document.createElement("button");
+    answerBtn.textContent = "Answer?";
+    modal.appendChild(answerBtn);
+
+    container.appendChild(modal);
+
+    answerBtn.addEventListener('click', () => {
+        answerBtn.style.display = 'none';
+        let answerDiv = document.createElement("div");
+        answerDiv.classList.add("answer");
+        answerDiv.textContent = `The Answer is: `;
+        modal.appendChild(answerDiv);
+    });
+
 }
-
-/* notes
-
-    next up: 
-        - figure out where the null values are coming from
-        - potentially because they are daily doubles. need to either note that somewhere for later
-        - or, need to assign it whichever value is missing
-*/
