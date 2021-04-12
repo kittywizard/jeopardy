@@ -1,28 +1,22 @@
-/* 
-    Jeopardy
-    
-    Write an async function 
-        that uses fetch() to fetch 4 categories 
-        from https://jservice.io/api/categories
-        parameters: count, offset
-        
-    Display the categories
-        in a simplified 4x5 Jeopardy Board 
-        using CSS Grid
-*/
+
 const grid = document.querySelector(".grid");
 const container = document.querySelector(".container");
 
+const count = 6; //determines the number of categories
+
+//these three are for determining the offset, which needs some work
+//TODO need to figure out offset, i keep getting the same categories
 let min = 1;
 let max = 100;
-const count = 6;
-let offset = Math.floor((Math.random() * (max - min + 1)) + min); //need to figure out offset, i keep getting the same categories
+let offset = Math.floor((Math.random() * (max - min + 1)) + min); 
 
+//all the various arrays i've needed
 let content = [],
     clueArray = [],
     finalArr = [],
     newArr = [];
 
+//objects to store clue/category data
 function ClueObject(question, answer, id, value, airdate, count) {
     this.question = question;
     this.answer = answer;
@@ -38,6 +32,8 @@ function CategoryObject(id, title, clueCount) {
     this.clueCount = clueCount;
 }
 
+//1. first function to run. sets up categories
+//2. then, calls getClues
 function getCategories(count) {
     fetch(`https://jservice.io/api/categories/?count=${count}&offset=${offset}`)
         .then(response => response.json())
@@ -51,6 +47,7 @@ function getCategories(count) {
                 grid.appendChild(div);
             });
         })
+        //fetching the clues for each category
         .then(() => {
             content.forEach(category => {
                 if (category.clueCount > 5) fetch5(category.id, [200, 400, 600, 800, 1000]);
@@ -58,29 +55,34 @@ function getCategories(count) {
                     fetch(`https://jservice.io/api/clues/?category=${category.id}`)
                         .then(response => response.json())
                         .then(data => data.forEach(clue => getClues(clue)))
+                        //after clues are fetched, either by fetch5 or the normal way, i need to sort the array
                         .then(() => {
+                            //this is where i need to check for the null values
+                            //TODO - the null checker doesn't seem to be working properly
                             clueArray.sort((a, b) => a.value - b.value);
-                            //search with category.id and values
-                            clueArray.forEach(clue => {if(clue.value == null) checkNulls(clueArray, clue, clue.id)})
+                            //clueArray.forEach(clue => {if(clue.value == null) checkNulls(clueArray, clue, clue.id)})
                         });
                 }
             });
+            getEvent();
         })
 }
 
-function checkNulls(arr, clue, id) {
-    //so i've got the entire array, the specific clue that triggered the call (which i honestly might not need?) 
-    //and the category id so i can just pull the others in the category?
+//3. runs after getCategories()
+//4. goes back to getCategories after finished running, returning its result
+function getClues(clue) {
+    let newObj = new ClueObject(clue.question, clue.answer, clue.category_id, clue.value, clue.airdate);
+    clueArray.push(newObj);
 
- console.log(clue)
- //this is going off too many times?
- //getting a bunch of repeat clues
-
+    let div = document.createElement('div');
+    div.classList.add('grid-item', 'clue', `v${newObj.value}`);
+    div.setAttribute("id", `${newObj.id}-${newObj.value}`); //need to fix this to have a unique number
+    //but need to actually set the grid up properly and WHY ARE THINGS NULL
+    div.textContent = `$${newObj.value}`;
+    grid.appendChild(div);
 }
 
-//this function, in theory should allow us to only pick the first value of each and shove it into the 
-//test array, a variable i really need to rename. 
-
+//3. get called around the same time as getClues, depending on parameters
 function fetch5(categoryid, value) {
     value.forEach(val => {
         fetch(`https://jservice.io/api/clues/?category=${categoryid}&value=${val}`)
@@ -95,49 +97,23 @@ function fetch5(categoryid, value) {
     });
 }
 
-function getClues(clue) {
-    let newObj = new ClueObject(clue.question, clue.answer, clue.category_id, clue.value, clue.airdate);
-    clueArray.push(newObj);
+//5. a work in progress function 
+function checkNulls(arr, clue, id) {
+    //so i've got the entire array, the specific clue that triggered the call (which i honestly might not need?) 
+    //and the category id so i can just pull the others in the category?
 
-    let div = document.createElement('div');
-    div.classList.add('grid-item', 'clue', `v${newObj.value}`);
-    div.setAttribute("id", `${newObj.id}-${newObj.value}`); //need to fix this to have a unique number
-    //but need to actually set the grid up properly and WHY ARE THINGS NULL
-    div.textContent = `$${newObj.value}`;
-    grid.appendChild(div);
+ console.log(clue)
+ //this is going off too many times?
+ //getting a bunch of repeat clues
+
 }
 
 getCategories(count);
 
-function getGrid() {
-
-    for (let a = 0; a < 5; a++) {
-        for (let i = 0; i < 6; i++) {
-            let clue = document.createElement("div");
-            clue.classList.add("grid-item", "clue");
-            clue.textContent = `$${values[a]}`;
-            grid.appendChild(clue);
-        }
-    }
-
-
-    clueDivs = document.querySelectorAll(".clue");
-    console.log(clueDivs)
-    clueDivs.forEach(div => {
-        div.addEventListener('click', (e) => {
-            console.log(e.target.textContent)
-
-            createModal(div)
-
-        });
-
-        //i don't know if this actually helps me or not.
-        let valueNum = parseInt(div.outerText.slice(1, 4));
-        clueValues.push(valueNum);
-    });
-
+function getEvent() {
+    let divs = document.querySelectorAll('.clue');
+    console.log(divs);
 }
-
 
 function createModal(div) {
 
