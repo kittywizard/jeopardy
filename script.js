@@ -58,12 +58,10 @@ function getCategories(count) {
                         .then(data => data.forEach(clue => getClues(clue)))
                         //after clues are fetched, either by fetch5 or the normal way, i need to sort the array
                         .then(() => {
-
                             clueArray.sort((a, b) => a.value - b.value);
                         });
                 }
             });
-            getEvent();
         })
 }
 
@@ -80,8 +78,6 @@ function getClues(clue) {
 
     div.textContent = `$${newObj.value}`;
     grid.appendChild(div);
-
-    getEvent();
 }
 
 //3. get called around the same time as getClues, depending on parameters
@@ -100,19 +96,22 @@ function fetch5(categoryid, value) {
 }
 
 getCategories(count);
+getEvent();
 
 function getEvent() {
-    let divs = document.querySelectorAll('.clue');
-    divs.forEach(div => {
-        div.addEventListener('click', () => {
-            //figure out how to grab the id 
-            //then createModal(div) it
-        })
-    })
+    const htmlObj = document.getElementsByClassName('clue');
+    //const divs = Array.from(htmlObj, obj => obj.id)
+    
+    console.log(htmlObj[1]);
+   
+    // divs.forEach(div => {
+    //     div.addEventListener('click', () => createModal(div))
+    // })
 }
 
 function createModal(div) {
 
+    console.log(div)
     modal = document.createElement("div");
     modal.classList.add("modal");
     grid.classList.add("dim"); // temp solution
@@ -123,21 +122,20 @@ function createModal(div) {
 
     */
 
-    modal.textContent = `Question:  `;
-    //modal.textContent += `This question originally aired ${data[0].airdate}`;
+    // modal.textContent = `Question:  `;
 
-    let answerBtn = document.createElement("button");
-    answerBtn.textContent = "Answer?";
-    modal.appendChild(answerBtn);
+    // let answerBtn = document.createElement("button");
+    // answerBtn.textContent = "Answer?";
+    // modal.appendChild(answerBtn);
 
-    container.appendChild(modal);
+    // container.appendChild(modal);
 
-    answerBtn.addEventListener('click', () => {
-        answerBtn.style.display = 'none';
-        let answerDiv = document.createElement("div");
-        answerDiv.classList.add("answer");
-        answerDiv.textContent = `The Answer is: `;
-        modal.appendChild(answerDiv);
-    });
+    // answerBtn.addEventListener('click', () => {
+    //     answerBtn.style.display = 'none';
+    //     let answerDiv = document.createElement("div");
+    //     answerDiv.classList.add("answer");
+    //     answerDiv.textContent = `The Answer is: `;
+    //     modal.appendChild(answerDiv);
+    // });
 
 }
